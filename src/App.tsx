@@ -1,25 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { createGlobalStyle } from "styled-components";
+import HelmetComponent from "./helmet";
+
+const GlobalCss = createGlobalStyle`
+body{
+  font-family: "Nunito", sans-serif;
+  background-color:${(props) => props.theme.bgColor};
+  color:${(props) => props.theme.textColor}
+}
+a {
+  text-decoration-line: none;
+color:inherit;
+}
+* {
+  box-sizing: border-box;
+}
+`;
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <HelmetComponent />
+      <GlobalCss />
+      <h1>nunito ?</h1>
+    </>
   );
 }
 
