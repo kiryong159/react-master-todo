@@ -1,5 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 import HelmetComponent from "./helmet";
+import ToDoList from "./ToDoList";
 
 const GlobalCss = createGlobalStyle`
 body{
@@ -21,7 +22,7 @@ function App() {
     <>
       <HelmetComponent />
       <GlobalCss />
-      <h1>nunito ?</h1>
+      <ToDoList />
     </>
   );
 }
