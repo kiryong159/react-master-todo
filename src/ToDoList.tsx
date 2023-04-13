@@ -39,16 +39,25 @@ interface IForm {
 }
 
 function ToDoList() {
-  const { register, handleSubmit, formState } = useForm<IForm>();
-  const onValid = (data: any) => {
-    console.log(data);
+  const { register, handleSubmit, formState, setError } = useForm<IForm>();
+  const onValid = (data: IForm) => {
+    if (data.password !== data.password2) {
+      setError("password2", { message: "ㅇㅇ" }, { shouldFocus: true });
+    }
   };
   console.log(formState.errors);
   return (
     <div>
       <FormBox onSubmit={handleSubmit(onValid)}>
         <input
-          {...register("todo", { required: "this is required" })}
+          {...register("todo", {
+            required: "this is required",
+            validate: {
+              noNico: (value) =>
+                value.includes("nico") ? "no nico ok " : true,
+              noNick: (value) => (value.includes("nick") ? "no nick ok" : true),
+            },
+          })}
           type="text"
           placeholder="write todo"
         />
