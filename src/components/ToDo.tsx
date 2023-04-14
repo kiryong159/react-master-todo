@@ -1,10 +1,19 @@
 import { useSetRecoilState } from "recoil";
 import { IToDos, toDoStatus } from "../atoms";
 
-function ToDo({ text, category }: IToDos) {
-  const setToDo = useSetRecoilState(toDoStatus);
+function ToDo({ text, category, id }: IToDos) {
+  const setToDos = useSetRecoilState(toDoStatus);
   const onClick = (newCategory: IToDos["category"]) => {
     console.log(newCategory);
+    setToDos((oldToDos) => {
+      const targetIndex = oldToDos.findIndex((toDo) => toDo.id === id);
+      const newTodo = { text, id, category: newCategory };
+      return [
+        ...oldToDos.slice(0, targetIndex),
+        newTodo,
+        ...oldToDos.slice(targetIndex + 1),
+      ];
+    });
   };
   return (
     <li>
