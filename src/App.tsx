@@ -1,6 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 import HelmetComponent from "./helmet";
-import ToDoList from "./ToDoList";
+import ToDoList from "./components/ToDoList";
 
 const GlobalCss = createGlobalStyle`
 body{
