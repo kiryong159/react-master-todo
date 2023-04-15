@@ -4,7 +4,6 @@ import { IToDos, toDoStatus } from "../atoms";
 function ToDo({ text, category, id }: IToDos) {
   const setToDos = useSetRecoilState(toDoStatus);
   const onClick = (newCategory: IToDos["category"]) => {
-    console.log(newCategory);
     setToDos((oldToDos) => {
       const targetIndex = oldToDos.findIndex((toDo) => toDo.id === id);
       const newTodo = { text, id, category: newCategory };
