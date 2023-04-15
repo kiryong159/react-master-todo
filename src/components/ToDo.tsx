@@ -1,5 +1,5 @@
 import { useSetRecoilState } from "recoil";
-import { IToDos, toDoStatus } from "../atoms";
+import { Categories, IToDos, toDoStatus } from "../atoms";
 
 function ToDo({ text, category, id }: IToDos) {
   const setToDos = useSetRecoilState(toDoStatus);
@@ -14,36 +14,43 @@ function ToDo({ text, category, id }: IToDos) {
       ];
     });
   };
+  const onDelete = () => {
+    setToDos((prev) => {
+      const deleteIndex = prev.findIndex((todo) => todo.id === id);
+      return [...prev.slice(0, deleteIndex), ...prev.slice(deleteIndex + 1)];
+    });
+  };
   return (
     <li>
       <span>{text}</span>
-      {category !== "DOING" && (
+      {category !== Categories.DOING && (
         <button
           onClick={() => {
-            onClick("DOING");
+            onClick(Categories.DOING);
           }}
         >
           Doing
         </button>
       )}
-      {category !== "TO_DO" && (
+      {category !== Categories.TO_DO && (
         <button
           onClick={() => {
-            onClick("TO_DO");
+            onClick(Categories.TO_DO);
           }}
         >
           ToDo
         </button>
       )}
-      {category !== "DONE" && (
+      {category !== Categories.DONE && (
         <button
           onClick={() => {
-            onClick("DONE");
+            onClick(Categories.DONE);
           }}
         >
           Done
         </button>
       )}
+      <button onClick={() => onDelete()}>Delete</button>
     </li>
   );
 }
