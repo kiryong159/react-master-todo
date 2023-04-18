@@ -1,9 +1,6 @@
-import React from "react";
-import { useRecoilState } from "recoil";
 import { createGlobalStyle } from "styled-components";
-import { hoursAtom, minutes } from "./atoms";
 import HelmetComponent from "./helmet";
-
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 const GlobalCss = createGlobalStyle`
 body{
   font-family: "Nunito", sans-serif;
@@ -20,30 +17,40 @@ color:inherit;
 `;
 
 function App() {
-  const [value, setValue] = useRecoilState(minutes);
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(+event.currentTarget.value);
-  };
-  const [hours, setHours] = useRecoilState(hoursAtom);
-  const hourChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setHours(+event.currentTarget.value);
-  };
+  const onDragEnd = () => {};
   return (
     <>
       <HelmetComponent />
       <GlobalCss />
-      <input
-        value={value}
-        type="number"
-        onChange={onChange}
-        placeholder="minutes"
-      ></input>
-      <input
-        value={hours}
-        onChange={hourChange}
-        type="number"
-        placeholder="hours"
-      ></input>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div>
+          <Droppable droppableId="one">
+            {(provided) => (
+              <ul ref={provided.innerRef} {...provided.droppableProps}>
+                <Draggable draggableId="first" index={0}>
+                  {(magic) => (
+                    <li ref={magic.innerRef} {...magic.draggableProps}>
+                      <span {...magic.dragHandleProps}>❤</span>
+                      one
+                    </li>
+                  )}
+                </Draggable>
+                <Draggable draggableId="second" index={1}>
+                  {(magic) => (
+                    <li
+                      ref={magic.innerRef}
+                      {...magic.dragHandleProps}
+                      {...magic.draggableProps}
+                    >
+                      two
+                    </li>
+                  )}
+                </Draggable>
+              </ul>
+            )}
+          </Droppable>
+        </div>
+      </DragDropContext>
     </>
   );
 }
