@@ -1,6 +1,8 @@
+import React from "react";
+import { useRecoilState } from "recoil";
 import { createGlobalStyle } from "styled-components";
+import { hoursAtom, minutes } from "./atoms";
 import HelmetComponent from "./helmet";
-import ToDoList from "./components/ToDoList";
 
 const GlobalCss = createGlobalStyle`
 body{
@@ -18,11 +20,30 @@ color:inherit;
 `;
 
 function App() {
+  const [value, setValue] = useRecoilState(minutes);
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(+event.currentTarget.value);
+  };
+  const [hours, setHours] = useRecoilState(hoursAtom);
+  const hourChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setHours(+event.currentTarget.value);
+  };
   return (
     <>
       <HelmetComponent />
       <GlobalCss />
-      <ToDoList />
+      <input
+        value={value}
+        type="number"
+        onChange={onChange}
+        placeholder="minutes"
+      ></input>
+      <input
+        value={hours}
+        onChange={hourChange}
+        type="number"
+        placeholder="hours"
+      ></input>
     </>
   );
 }
