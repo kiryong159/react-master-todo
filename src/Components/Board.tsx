@@ -1,5 +1,8 @@
 import { Droppable } from "react-beautiful-dnd";
+import { useForm } from "react-hook-form";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
+import { IToDOs, toDoState } from "../atoms";
 import DraggableCard from "./DraggableCard";
 
 const Wrapper = styled.div`
@@ -32,8 +35,15 @@ const Area = styled.div<IAreaProps>`
   transition: background-color 0.3s ease-in-out;
 `;
 
+const Form = styled.form`
+  width: 100%;
+  input {
+    width: 100%;
+  }
+`;
+
 interface IBoardProps {
-  toDos: string[];
+  toDos: IToDOs[];
   droppableId: string;
 }
 
@@ -42,10 +52,36 @@ interface IAreaProps {
   draggingFromThisWith: boolean;
 }
 
+interface IForm {
+  toDo: string;
+}
+
 function Board({ toDos, droppableId }: IBoardProps) {
+  const { register, handleSubmit, setValue } = useForm<IForm>();
+  const setToDoState = useSetRecoilState(toDoState);
+  const onValid = ({ toDo }: IForm) => {
+    const newToDo = {
+      id: Date.now(),
+      text: toDo,
+    };
+    setToDoState((allBoards) => {
+      return {
+        ...allBoards,
+        [droppableId]: [...allBoards[droppableId], newToDo],
+      };
+    });
+    setValue("toDo", "");
+  };
   return (
     <Wrapper>
       <Title>{droppableId}</Title>
+      <Form onSubmit={handleSubmit(onValid)}>
+        <input
+          {...register("toDo", { required: true })}
+          type="text"
+          placeholder="Add ToDo"
+        />
+      </Form>
       <Droppable droppableId={droppableId}>
         {(provided, snapshot) => (
           <Area
@@ -55,7 +91,12 @@ function Board({ toDos, droppableId }: IBoardProps) {
             {...provided.droppableProps}
           >
             {toDos.map((todo, index) => (
-              <DraggableCard key={todo} index={index} todo={todo} />
+              <DraggableCard
+                key={todo.id}
+                index={index}
+                toDoId={todo.id}
+                toDoText={todo.text}
+              />
             ))}
             {provided.placeholder}
           </Area>
