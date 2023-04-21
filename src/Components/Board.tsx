@@ -1,3 +1,5 @@
+import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
@@ -21,6 +23,15 @@ const Title = styled.h1`
   font-weight: 600;
   margin-bottom: 10px;
   font-size: 18px;
+  position: relative;
+  button {
+    position: absolute;
+    top: -30px;
+    right: 5px;
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+  }
 `;
 
 const Area = styled.div<IAreaProps>`
@@ -37,8 +48,12 @@ const Area = styled.div<IAreaProps>`
 
 const Form = styled.form`
   width: 100%;
+  padding: 5px 10px;
   input {
     width: 100%;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 10px;
   }
 `;
 
@@ -72,9 +87,21 @@ function Board({ toDos, droppableId }: IBoardProps) {
     });
     setValue("toDo", "");
   };
+  const onBoardDelete = () => {
+    setToDoState((allboards) => {
+      const copyboard = { ...allboards };
+      delete copyboard[droppableId];
+      return { ...copyboard };
+    });
+  };
   return (
     <Wrapper>
-      <Title>{droppableId}</Title>
+      <Title>
+        {droppableId}
+        <button onClick={onBoardDelete}>
+          <FontAwesomeIcon icon={faCircleXmark} />
+        </button>
+      </Title>
       <Form onSubmit={handleSubmit(onValid)}>
         <input
           {...register("toDo", { required: true })}
@@ -90,12 +117,13 @@ function Board({ toDos, droppableId }: IBoardProps) {
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
-            {toDos.map((todo, index) => (
+            {toDos?.map((todo, index) => (
               <DraggableCard
                 key={todo.id}
                 index={index}
                 toDoId={todo.id}
                 toDoText={todo.text}
+                droppableId={droppableId}
               />
             ))}
             {provided.placeholder}

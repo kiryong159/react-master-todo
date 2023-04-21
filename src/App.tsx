@@ -2,8 +2,11 @@ import styled, { createGlobalStyle } from "styled-components";
 import HelmetComponent from "./helmet";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useRecoilState } from "recoil";
-import { toDoState } from "./atoms";
+import { addListState, toDoState } from "./atoms";
 import Board from "./Components/Board";
+import { faFolderPlus } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { SubmitHandler, FieldValues, useForm } from "react-hook-form";
 const GlobalCss = createGlobalStyle`
 body{
   font-family: "Nunito", sans-serif;
@@ -36,8 +39,52 @@ const Boards = styled.div`
   gap: 10px;
 `;
 
+const Button = styled.button`
+  position: absolute;
+  top: 100px;
+  right: 150px;
+  border: none;
+  background-color: inherit;
+  font-size: 40px;
+  cursor: pointer;
+`;
+
+const ListForm = styled.form`
+  position: absolute;
+  top: 200px;
+  right: 250px;
+  z-index: 99;
+  div {
+    display: flex;
+    width: 250px;
+    height: 150px;
+    background-color: white;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px 1px #34495e;
+
+    span {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    input {
+      margin: 10px 0px;
+      width: 80%;
+      height: 30px;
+      background-color: inherit;
+      border: none;
+      box-shadow: 0px 0px 1px 0px #34495e;
+      border-radius: 10px;
+      padding: 5px 10px;
+    }
+  }
+`;
+
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [AddList, setAddList] = useRecoilState(addListState);
   const onDragEnd = (info: DropResult) => {
     console.log(info);
     const { destination, source } = info;
@@ -68,10 +115,39 @@ function App() {
       });
     }
   };
+  const onAddClick = () => {
+    setAddList((prev) => !prev);
+  };
+  const { register, handleSubmit, setValue } = useForm();
+  const onValid: SubmitHandler<FieldValues> = (data) => {
+    const ListName = data.Listname;
+    setToDos((oldToDos) => {
+      return { ...oldToDos, [`${ListName}`]: [] };
+    });
+    setAddList(false);
+    setValue("Listname", "");
+    console.log(toDos);
+  };
   return (
     <>
       <HelmetComponent />
       <GlobalCss />
+      <Button onClick={onAddClick}>
+        <FontAwesomeIcon icon={faFolderPlus} />
+      </Button>
+      {AddList ? (
+        <ListForm onSubmit={handleSubmit(onValid)}>
+          <div>
+            <span>What your List Name?</span>
+            <input
+              {...register("Listname", { required: true })}
+              type="text"
+              placeholder="Write List Name"
+            />
+            <input type="submit" value="ADD List" />
+          </div>
+        </ListForm>
+      ) : null}
       <DragDropContext onDragEnd={onDragEnd}>
         <Wrapper>
           <Boards>
