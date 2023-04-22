@@ -1,12 +1,7 @@
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import styled, { createGlobalStyle } from "styled-components";
 import HelmetComponent from "./helmet";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
-import { useRecoilState } from "recoil";
-import { addListState, toDoState } from "./atoms";
-import Board from "./Components/Board";
-import { faFolderPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SubmitHandler, FieldValues, useForm } from "react-hook-form";
+
 const GlobalCss = createGlobalStyle`
 body{
   font-family: "Nunito", sans-serif;
@@ -83,82 +78,41 @@ const ListForm = styled.form`
 `;
 
 function App() {
-  const [toDos, setToDos] = useRecoilState(toDoState);
-  const [AddList, setAddList] = useRecoilState(addListState);
-  const onDragEnd = (info: DropResult) => {
-    console.log(info);
-    const { destination, source } = info;
-    if (!destination) return;
-    if (destination?.droppableId === source.droppableId) {
-      //같은박스이동
-      setToDos((allBoards) => {
-        const copyBoard = [...allBoards[source.droppableId]];
-        const taskObj = copyBoard[source.index];
-        copyBoard.splice(source.index, 1);
-        copyBoard.splice(destination?.index, 0, taskObj);
-        return { ...allBoards, [source.droppableId]: copyBoard };
-      });
-    }
-    if (destination.droppableId !== source.droppableId) {
-      //다른박스 이동
-      setToDos((allBoards) => {
-        const copySource = [...allBoards[source.droppableId]];
-        const taskObj = copySource[source.index];
-        const copyDestination = [...allBoards[destination.droppableId]];
-        copySource.splice(source.index, 1);
-        copyDestination.splice(destination.index, 0, taskObj);
-        return {
-          ...allBoards,
-          [source.droppableId]: copySource,
-          [destination.droppableId]: copyDestination,
-        };
-      });
-    }
-  };
-  const onAddClick = () => {
-    setAddList((prev) => !prev);
-  };
-  const { register, handleSubmit, setValue } = useForm();
-  const onValid: SubmitHandler<FieldValues> = (data) => {
-    const ListName = data.Listname;
-    setToDos((oldToDos) => {
-      return { ...oldToDos, [`${ListName}`]: [] };
-    });
-    setAddList(false);
-    setValue("Listname", "");
-    console.log(toDos);
-  };
+  const onDragEnd = () => {};
   return (
     <>
       <HelmetComponent />
       <GlobalCss />
-      <Button onClick={onAddClick}>
-        <FontAwesomeIcon icon={faFolderPlus} />
-      </Button>
-      {AddList ? (
-        <ListForm onSubmit={handleSubmit(onValid)}>
-          <div>
-            <span>What your List Name?</span>
-            <input
-              {...register("Listname", { required: true })}
-              type="text"
-              placeholder="Write List Name"
-            />
-            <input type="submit" value="ADD List" />
-          </div>
-        </ListForm>
-      ) : null}
       <DragDropContext onDragEnd={onDragEnd}>
         <Wrapper>
-          <Boards>
-            {Object.keys(toDos).map((boardId) => (
-              <Board
-                key={boardId}
-                droppableId={boardId}
-                toDos={toDos[boardId]}
-              />
-            ))}
-          </Boards>
+          <Droppable droppableId="1">
+            {(magic) => (
+              <ul ref={magic.innerRef} {...magic.droppableProps}>
+                <Draggable draggableId="one" index={0}>
+                  {(magic) => (
+                    <li
+                      ref={magic.innerRef}
+                      {...magic.dragHandleProps}
+                      {...magic.draggableProps}
+                    >
+                      hello
+                    </li>
+                  )}
+                </Draggable>
+                <Draggable draggableId="two" index={1}>
+                  {(magic) => (
+                    <li
+                      ref={magic.innerRef}
+                      {...magic.dragHandleProps}
+                      {...magic.draggableProps}
+                    >
+                      hellod
+                    </li>
+                  )}
+                </Draggable>
+              </ul>
+            )}
+          </Droppable>
         </Wrapper>
       </DragDropContext>
     </>
