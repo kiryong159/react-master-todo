@@ -1,5 +1,12 @@
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
 import styled, { createGlobalStyle } from "styled-components";
+import { toDosState } from "./atoms";
 import HelmetComponent from "./helmet";
 
 const GlobalCss = createGlobalStyle`
@@ -78,41 +85,54 @@ const ListForm = styled.form`
 `;
 
 function App() {
-  const onDragEnd = () => {};
+  const [toDos, setToDos] = useRecoilState(toDosState);
+  const onDragEnd = (data: DropResult) => {
+    const { source, destination, draggableId } = data;
+    /* 
+    source => 출발지  index / droppableId->board항목 
+    destination => 도착지
+    draggableId -> 내용
+    */
+    if (!destination) return;
+    if (destination.droppableId === source.droppableId) {
+      //같은 보드 이동
+      setToDos((allBoards) => {
+        const copyBoards = [...allBoards];
+        copyBoards.splice(source.index, 1);
+        copyBoards.splice(destination.index, 0, draggableId);
+        return copyBoards;
+      });
+    }
+  };
+
   return (
     <>
       <HelmetComponent />
       <GlobalCss />
       <DragDropContext onDragEnd={onDragEnd}>
         <Wrapper>
-          <Droppable droppableId="1">
-            {(magic) => (
-              <ul ref={magic.innerRef} {...magic.droppableProps}>
-                <Draggable draggableId="one" index={0}>
-                  {(magic) => (
-                    <li
-                      ref={magic.innerRef}
-                      {...magic.dragHandleProps}
-                      {...magic.draggableProps}
-                    >
-                      hello
-                    </li>
-                  )}
-                </Draggable>
-                <Draggable draggableId="two" index={1}>
-                  {(magic) => (
-                    <li
-                      ref={magic.innerRef}
-                      {...magic.dragHandleProps}
-                      {...magic.draggableProps}
-                    >
-                      hellod
-                    </li>
-                  )}
-                </Draggable>
-              </ul>
-            )}
-          </Droppable>
+          <Boards>
+            <Droppable droppableId="List-ToDo">
+              {(magic) => (
+                <div ref={magic.innerRef} {...magic.droppableProps}>
+                  {toDos.map((toDo, index) => (
+                    <Draggable key={toDo} draggableId={toDo} index={index}>
+                      {(magic) => (
+                        <li
+                          ref={magic.innerRef}
+                          {...magic.dragHandleProps}
+                          {...magic.draggableProps}
+                        >
+                          {toDo}
+                        </li>
+                      )}
+                    </Draggable>
+                  ))}
+                  {magic.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </Boards>
         </Wrapper>
       </DragDropContext>
     </>
