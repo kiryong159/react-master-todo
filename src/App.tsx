@@ -1,12 +1,8 @@
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from "react-beautiful-dnd";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useRecoilState } from "recoil";
 import styled, { createGlobalStyle } from "styled-components";
 import { toDosState } from "./atoms";
+import Board from "./Components/Board";
 import HelmetComponent from "./helmet";
 
 const GlobalCss = createGlobalStyle`
@@ -97,10 +93,10 @@ function App() {
     if (destination.droppableId === source.droppableId) {
       //같은 보드 이동
       setToDos((allBoards) => {
-        const copyBoards = [...allBoards];
+        const copyBoards = [...allBoards[source.droppableId]];
         copyBoards.splice(source.index, 1);
         copyBoards.splice(destination.index, 0, draggableId);
-        return copyBoards;
+        return { ...allBoards, [source.droppableId]: copyBoards };
       });
     }
   };
@@ -112,26 +108,13 @@ function App() {
       <DragDropContext onDragEnd={onDragEnd}>
         <Wrapper>
           <Boards>
-            <Droppable droppableId="List-ToDo">
-              {(magic) => (
-                <div ref={magic.innerRef} {...magic.droppableProps}>
-                  {toDos.map((toDo, index) => (
-                    <Draggable key={toDo} draggableId={toDo} index={index}>
-                      {(magic) => (
-                        <li
-                          ref={magic.innerRef}
-                          {...magic.dragHandleProps}
-                          {...magic.draggableProps}
-                        >
-                          {toDo}
-                        </li>
-                      )}
-                    </Draggable>
-                  ))}
-                  {magic.placeholder}
-                </div>
-              )}
-            </Droppable>
+            {Object.keys(toDos).map((boardName) => (
+              <Board
+                key={boardName}
+                toDos={toDos[boardName]}
+                boardName={boardName}
+              />
+            ))}
           </Boards>
         </Wrapper>
       </DragDropContext>
