@@ -99,6 +99,20 @@ function App() {
         return { ...allBoards, [source.droppableId]: copyBoards };
       });
     }
+    if (destination.droppableId !== source.droppableId) {
+      //다른 보드로 이동
+      setToDos((allBoards) => {
+        const sourceBoard = [...allBoards[source.droppableId]];
+        sourceBoard.splice(source.index, 1);
+        const destBoard = [...allBoards[destination.droppableId]];
+        destBoard.splice(destination.index, 0, draggableId);
+        return {
+          ...allBoards,
+          [source.droppableId]: sourceBoard,
+          [destination.droppableId]: destBoard,
+        };
+      });
+    }
   };
 
   return (
