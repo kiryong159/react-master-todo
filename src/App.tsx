@@ -94,8 +94,9 @@ function App() {
       //같은 보드 이동
       setToDos((allBoards) => {
         const copyBoards = [...allBoards[source.droppableId]];
+        const taskObj = copyBoards[source.index];
         copyBoards.splice(source.index, 1);
-        copyBoards.splice(destination.index, 0, draggableId);
+        copyBoards.splice(destination.index, 0, taskObj);
         return { ...allBoards, [source.droppableId]: copyBoards };
       });
     }
@@ -103,9 +104,10 @@ function App() {
       //다른 보드로 이동
       setToDos((allBoards) => {
         const sourceBoard = [...allBoards[source.droppableId]];
+        const taskObj = sourceBoard[source.index];
         sourceBoard.splice(source.index, 1);
         const destBoard = [...allBoards[destination.droppableId]];
-        destBoard.splice(destination.index, 0, draggableId);
+        destBoard.splice(destination.index, 0, taskObj);
         return {
           ...allBoards,
           [source.droppableId]: sourceBoard,
